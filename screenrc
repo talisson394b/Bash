@@ -1,0 +1,38 @@
+#! /usr/bin/env bash
+
+#vim:set ft=sh
+
+XRESOURCES="${HOME}/.Xresources"
+WALLPAPER="${HOME}/Pictures/wallpaper"
+
+
+function load_resources {
+    if ! [ -z "$DISPLAY" ]; then
+        xrdb -remove
+        xrdb -merge $XRESOURCES
+    fi
+}
+
+
+function set_wallpaper {
+    arch="$(find "$WALLPAPER" -name "*[.png][.jpg]" | head -1)"
+    if ! [ -z "$arch" ]; then
+	feh --bg-fill "$arch"
+    fi
+}
+
+
+function reload_bar {
+     pkill bar 
+     bar >> /tmp/$$ &
+}
+
+
+function main {
+   load_resources
+   set_wallpaper
+#   sleep 1
+#   reload_bar
+}
+
+main

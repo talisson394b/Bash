@@ -1,0 +1,65 @@
+#! /usr/bin/env bash
+#vim set ft=sh
+
+
+function get_workspaces {
+    workspaces="$(wmctrl -d | awk '{
+        if($2=="*") printf " %s%s%s ", "%{F#569184}",$NF,"%{F-}";else printf " %s ", $NF}
+    ')"
+    
+    printf "%s\\n" "$workspaces"
+}
+
+
+function get_window {
+    window="$(xdotool getwindowfocus getwindowname)"
+    window_icon="\uf24d"
+
+    printf "  %b%s\\n" "$(icon ${window_icon}) $window"
+}
+
+
+function get_date {
+    printf "%s\\n" "$(date +"%a %d %b - %H:%M")"
+}
+
+
+function get_wifi {
+    wifi="$(echo -e $(iw wlan0 link | grep 'SSID' | cut -c 8-))"
+    wifi_icon="\uf1eb"
+
+    printf "%b%s\\n" "$(icon ${wifi_icon}) ${wifi}"
+}
+
+
+function icon() {
+    # Format an icon.
+    printf "%s\\n" "%{F${color4}}${1}%{F-}"
+}
+
+
+
+
+function main { 
+    # Import a colors pallete
+    . "${HOME}/.Xresources.d/colors/dark/dark.sh"
+
+    while :; do
+        workspace="$(get_workspaces)"
+        window="$(get_window)"
+	date="$(get_date)"
+	wifi="$(get_wifi)"
+
+        printf "%s%s%s\\n" \
+	       "%{l} ${workspace} | ${window}" \
+	       "%{c} ${date}"\
+	       "%{r} ${wifi}"
+	
+	sleep 0.5s
+        done | \
+	lemonbar -g "x40" -B "${background}" -F "${foreground}" -f "Fira Mono Medium:style=Medium:size=9" -f "Font Awesome 5 Free Solid:style=Solid:size=9" 
+}
+
+
+main "$@"
+
